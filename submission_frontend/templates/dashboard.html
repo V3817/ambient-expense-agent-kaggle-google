@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Approval Portal - Ambient Expense Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(25, 28, 41, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-hover: rgba(147, 51, 234, 0.3);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-purple: #a855f7;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --font-main: 'Outfit', 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        header {
+            padding: 2.5rem 2rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-weight: 300;
+        }
+
+        .stats-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .stats-count {
+            color: var(--accent-purple);
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-border-hover);
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.08);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+        }
+
+        .submitter {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-medium {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent-orange);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .badge-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .amount-container {
+            margin-bottom: 1rem;
+        }
+
+        .amount {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 0.75rem;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .metadata-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.5;
+        }
+
+        .metadata-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            outline: none;
+            position: relative;
+        }
+
+        .btn-approve {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-approve:hover {
+            background: var(--accent-green);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-reject:hover {
+            background: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-details {
+            grid-column: span 2;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-details:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--card-bg);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Slide-out Drawer/Modal */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 100%;
+            max-width: 450px;
+            height: 100%;
+            background: #11131e;
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .drawer-overlay.open .drawer {
+            transform: translateX(-450px);
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+        }
+
+        .drawer-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .drawer-section {
+            margin-bottom: 2rem;
+        }
+
+        .drawer-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .analysis-text {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e5e7eb;
+        }
+
+        .factor-tag {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .no-factors {
+            color: var(--accent-green);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1002;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: rgba(17, 19, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--accent-red);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <h1>Approval Center</h1>
+            <div class="subtitle">Agentic Expense Operations Dashboard</div>
+        </div>
+        <div class="stats-badge">
+            <span class="spinner" style="width: 12px; height: 12px;" id="refresh-spinner"></span>
+            <span>Pending Approvals:</span>
+            <span class="stats-count" id="pending-count">0</span>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="section-title">Pending Manager Decisions</h2>
+        
+        <div class="grid" id="approvals-grid">
+            <!-- Loading State -->
+            <div class="empty-state" id="loading-state">
+                <span class="spinner" style="width: 32px; height: 32px; color: var(--accent-purple); margin-bottom: 1rem;"></span>
+                <div class="empty-title">Fetching pending approvals...</div>
+                <div class="empty-subtitle">Reading active sessions from Vertex AI</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Slide-out Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()">
+        <div class="drawer" id="drawer" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <h3 class="drawer-title">Compliance Assessment</h3>
+                <button class="close-btn" onclick="closeDrawer()">&times;</button>
+            </div>
+            
+            <div class="drawer-section">
+                <div class="drawer-section-title">Expense Details</div>
+                <div class="metadata-grid" style="border: none; padding-top: 0; margin-bottom: 0;">
+                    <div class="metadata-item">
+                        <span class="metadata-label">Submitter</span>
+                        <span class="metadata-value" id="detail-submitter">-</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Amount</span>
+                        <span class="metadata-value" id="detail-amount">-</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Category</span>
+                        <span class="metadata-value" id="detail-category">-</span>
+                    </div>
+                    <div class="metadata-item">
+                        <span class="metadata-label">Date</span>
+                        <span class="metadata-value" id="detail-date">-</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <span class="metadata-label">Description</span>
+                    <p style="font-size: 0.95rem; font-weight: 500; margin-top: 0.25rem;" id="detail-description">-</p>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">LLM Risk Judgment</div>
+                <div class="analysis-text" id="detail-analysis">
+                    No risk assessment details available.
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">Anomalies / Violations</div>
+                <div id="detail-factors">
+                    <div class="no-factors">✓ No compliance violations detected.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        let pendingApprovals = [];
+
+        // Fetch pending approvals on load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPending();
+            // Poll every 15 seconds to keep dashboard fresh
+            setInterval(fetchPending, 15000);
+        });
+
+        async function fetchPending() {
+            const spinner = document.getElementById('refresh-spinner');
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/pending');
+                if (!response.ok) throw new Error('Failed to fetch pending approvals');
+                
+                pendingApprovals = await response.json();
+                renderApprovals();
+            } catch (error) {
+                console.error(error);
+                showToast('Error loading pending approvals', 'error');
+            } finally {
+                spinner.style.display = 'none';
+            }
+        }
+
+        function renderApprovals() {
+            const grid = document.getElementById('approvals-grid');
+            const countBadge = document.getElementById('pending-count');
+            const loadingState = document.getElementById('loading-state');
+            
+            countBadge.textContent = pendingApprovals.length;
+            
+            if (loadingState) {
+                loadingState.remove();
+            }
+            
+            if (pendingApprovals.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✓</div>
+                        <div class="empty-title">All Caught Up!</div>
+                        <div class="empty-subtitle">No pending expense approvals require your attention.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = '';
+            pendingApprovals.forEach(appr => {
+                const amount = appr.expense.amount || 0.0;
+                const submitter = appr.expense.submitter || 'Unknown';
+                const description = appr.expense.description || 'No description';
+                const category = appr.expense.category || 'General';
+                const date = appr.expense.date || 'N/A';
+                
+                // Parse risk details safely
+                let riskLevel = 'Low';
+                let riskFactors = [];
+                let explanation = '';
+                
+                if (appr.risk_assessment) {
+                    riskLevel = appr.risk_assessment.risk_level || 'Low';
+                    riskFactors = appr.risk_assessment.risk_factors || [];
+                    explanation = appr.risk_assessment.explanation || '';
+                }
+                
+                const badgeClass = `badge-${riskLevel.toLowerCase()}`;
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${appr.session_id}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="card-header">
+                            <span class="submitter" title="${submitter}">${submitter}</span>
+                            <span class="badge ${badgeClass}">${riskLevel} Risk</span>
+                        </div>
+                        
+                        <div class="amount-container">
+                            <span class="amount">$${amount.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="description">${description}</div>
+                        
+                        <div class="metadata-grid">
+                            <div class="metadata-item">
+                                <span class="metadata-label">Category</span>
+                                <span class="metadata-value">${category}</span>
+                            </div>
+                            <div class="metadata-item">
+                                <span class="metadata-label">Date</span>
+                                <span class="metadata-value">${date}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button class="btn btn-details" onclick="viewDetails('${appr.session_id}')">
+                            View Compliance Audit
+                        </button>
+                        <div class="actions">
+                            <button class="btn btn-reject" id="btn-reject-${appr.session_id}" onclick="submitAction('${appr.session_id}', '${appr.interrupt_id}', false)">
+                                <span>Reject</span>
+                            </button>
+                            <button class="btn btn-approve" id="btn-approve-${appr.session_id}" onclick="submitAction('${appr.session_id}', '${appr.interrupt_id}', true)">
+                                <span>Approve</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function viewDetails(sessionId) {
+            const appr = pendingApprovals.find(a => a.session_id === sessionId);
+            if (!appr) return;
+            
+            document.getElementById('detail-submitter').textContent = appr.expense.submitter || 'Unknown';
+            document.getElementById('detail-amount').textContent = `$${(appr.expense.amount || 0.0).toFixed(2)}`;
+            document.getElementById('detail-category').textContent = appr.expense.category || 'General';
+            document.getElementById('detail-date').textContent = appr.expense.date || 'N/A';
+            document.getElementById('detail-description').textContent = appr.expense.description || 'No description';
+            
+            const analysisText = document.getElementById('detail-analysis');
+            const factorsContainer = document.getElementById('detail-factors');
+            
+            if (appr.risk_assessment) {
+                analysisText.textContent = appr.risk_assessment.explanation || 'No explanation provided.';
+                
+                const factors = appr.risk_assessment.risk_factors || [];
+                if (factors.length > 0) {
+                    factorsContainer.innerHTML = factors.map(f => `
+                        <div class="factor-tag">
+                            <span>⚠</span>
+                            <span>${f}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    factorsContainer.innerHTML = `<div class="no-factors" style="color: var(--accent-green);">✓ No compliance violations detected.</div>`;
+                }
+            } else {
+                analysisText.textContent = 'No risk assessment details available.';
+                factorsContainer.innerHTML = `<div class="no-factors">No compliance violations detected.</div>`;
+            }
+            
+            document.getElementById('drawer-overlay').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('open');
+        }
+
+        async function submitAction(sessionId, interruptId, approved) {
+            const appr = pendingApprovals.find(a => a.session_id === sessionId);
+            if (!appr) return;
+
+            const approveBtn = document.getElementById(`btn-approve-${sessionId}`);
+            const rejectBtn = document.getElementById(`btn-reject-${sessionId}`);
+            
+            // Set loading states
+            const targetBtn = approved ? approveBtn : rejectBtn;
+            const originalHtml = targetBtn.innerHTML;
+            targetBtn.innerHTML = `<span class="spinner"></span>`;
+            approveBtn.disabled = true;
+            rejectBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`/api/action/${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        approved: approved,
+                        interrupt_id: interruptId,
+                        user_id: appr.user_id
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Action execution failed');
+                
+                showToast(`Expense successfully ${approved ? 'approved' : 'rejected'}`, 'success');
+                
+                // Remove card from UI with a nice fade-out
+                const card = document.getElementById(`card-${sessionId}`);
+                card.style.transform = 'scale(0.9) translateY(20px)';
+                card.style.opacity = '0';
+                card.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    pendingApprovals = pendingApprovals.filter(a => a.session_id !== sessionId);
+                    renderApprovals();
+                }, 300);
+                
+            } catch (error) {
+                console.error(error);
+                showToast(`Failed to submit decision: ${error.message}`, 'error');
+                // Restore buttons
+                targetBtn.innerHTML = originalHtml;
+                approveBtn.disabled = false;
+                rejectBtn.disabled = false;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✓' : '⚠'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            // Remove toast after 4 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
